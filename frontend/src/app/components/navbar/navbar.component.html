@@ -1,0 +1,44 @@
+<nav class="bg-white shadow-md">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <a routerLink="/" class="text-2xl font-bold text-primary-500">
+          reddit<span class="text-gray-700">clone</span>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="flex items-center space-x-4">
+        <a routerLink="/" class="text-gray-700 hover:text-primary-500 px-3 py-2 rounded-md">
+          Inicio
+        </a>
+        <a routerLink="/subreddits" class="text-gray-700 hover:text-primary-500 px-3 py-2 rounded-md">
+          Comunidades
+        </a>
+
+        @if (currentUser) {
+          <a routerLink="/posts/create" class="bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600">
+            Crear Post
+          </a>
+          <div class="flex items-center space-x-3">
+            <span class="text-gray-700">{{ currentUser.username }}</span>
+            <button 
+              (click)="logout()"
+              class="text-gray-700 hover:text-primary-500 px-3 py-2 rounded-md"
+            >
+              Salir
+            </button>
+          </div>
+        } @else {
+          <a routerLink="/login" class="text-gray-700 hover:text-primary-500 px-3 py-2 rounded-md">
+            Iniciar Sesión
+          </a>
+          <a routerLink="/register" class="bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600">
+            Registro
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

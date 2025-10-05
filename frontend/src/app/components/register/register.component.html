@@ -1,0 +1,75 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-md w-96">
+    <h2 class="text-2xl font-bold mb-6 text-center">Registrarse</h2>
+    
+    <form (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de usuario</label>
+        <input
+          type="text"
+          [(ngModel)]="registerData.username"
+          name="username"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          placeholder="Elige un nombre de usuario"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+        <input
+          type="email"
+          [(ngModel)]="registerData.email"
+          name="email"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          placeholder="tu@ejemplo.com"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="registerData.password"
+          name="password"
+          required
+          minlength="6"
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          placeholder="Al menos 6 caracteres"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Confirmar Contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="registerData.confirmPassword"
+          name="confirmPassword"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          placeholder="Vuelve a escribir tu contraseña"
+        />
+      </div>
+
+      @if (error) {
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {{ error }}
+        </div>
+      }
+
+      <button
+        type="submit"
+        [disabled]="loading"
+        class="w-full bg-primary-500 text-white py-2 rounded-md hover:bg-primary-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+      >
+        {{ loading ? 'Creando cuenta...' : 'Registrarse' }}
+      </button>
+    </form>
+
+    <p class="mt-4 text-center text-sm text-gray-600">
+      ¿Ya tienes una cuenta?
+      <a routerLink="/login" class="text-primary-500 hover:text-primary-600">Iniciar Sesión</a>
+    </p>
+  </div>
+</div>

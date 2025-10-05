@@ -1,0 +1,163 @@
+<div class="min-h-screen bg-gray-100">
+  <div class="max-w-4xl mx-auto py-8 px-4">
+    @if (post) {
+      <!-- Post Card -->
+      <div class="bg-white rounded-lg shadow mb-6 flex">
+        <!-- Vote section -->
+        <div class="w-12 bg-gray-50 rounded-l-lg flex flex-col items-center py-4">
+          <button 
+            (click)="votePost(1)"
+            [class.text-primary-500]="post.userVote === 1"
+            class="hover:text-primary-500 transition"
+            [disabled]="!isAuthenticated"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M5 10l5-5 5 5H5z"/>
+            </svg>
+          </button>
+          <span class="text-sm font-bold my-2" [class.text-primary-500]="post.voteCount > 0" [class.text-blue-500]="post.voteCount < 0">
+            {{ post.voteCount }}
+          </span>
+          <button 
+            (click)="votePost(-1)"
+            [class.text-blue-500]="post.userVote === -1"
+            class="hover:text-blue-500 transition"
+            [disabled]="!isAuthenticated"
+          >
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M15 10l-5 5-5-5h10z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Post content -->
+        <div class="flex-1 p-6">
+          <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+            <div class="flex items-center">
+              <a [routerLink]="['/r', post.subredditId]" class="font-bold text-gray-900 hover:underline">
+                r/{{ post.subredditName }}
+              </a>
+              <span class="mx-2">•</span>
+              <span>Publicado por u/{{ post.authorUsername }}</span>
+              <span class="mx-2">•</span>
+              <span>{{ getTimeAgo(post.createdAt) }}</span>
+            </div>
+            @if (canDeletePost()) {
+              <button 
+                (click)="deletePost()"
+                class="text-primary-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded transition text-sm"
+                title="Eliminar publicación"
+              >
+                
+                <div style="width: 16px; height: 16px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/></svg>
+  
+                </div>              </button>
+            }
+          </div>
+
+          <h1 class="text-2xl font-bold mb-4">{{ post.title }}</h1>
+          <p class="text-gray-700 whitespace-pre-wrap">{{ post.content }}</p>
+        </div>
+      </div>
+
+      <!-- Comment Form -->
+      @if (isAuthenticated) {
+        <div class="bg-white rounded-lg shadow mb-6 p-6">
+          <h3 class="text-lg font-semibold mb-3">Añadir comentario</h3>
+          <textarea
+            [(ngModel)]="newComment"
+            rows="3"
+            placeholder="¿Cuales son tus pensamientos?"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          ></textarea>
+          <button
+            (click)="submitComment()"
+            [disabled]="!newComment.trim()"
+            class="mt-2 bg-primary-500 text-white px-4 py-2 rounded-md hover:bg-primary-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            Comentario
+          </button>
+        </div>
+      } @else {
+        <div class="bg-white rounded-lg shadow mb-6 p-6 text-center">
+          <p class="text-gray-600">
+            <a routerLink="/login" class="text-primary-500 hover:underline">Iniciar Sesión</a> o 
+            <a routerLink="/register" class="text-primary-500 hover:underline">Registrate</a> para dejar un comentario
+          </p>
+        </div>
+      }
+
+      <!-- Comments List -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold mb-4">Comentarios ({{ comments.length }})</h3>
+        
+        @if (comments.length === 0) {
+          <p class="text-gray-500 text-center py-8">Sin comentarios. Se el primero en comentar!</p>
+        } @else {
+          <div class="space-y-4">
+            @for (comment of comments; track comment.id) {
+              <div class="border-l-2 border-gray-200 pl-4">
+                <div class="flex items-start space-x-2">
+                  <!-- Vote buttons -->
+                  <div class="flex flex-col items-center">
+                    <button 
+                      (click)="voteComment(comment.id, 1)"
+                      [class.text-primary-500]="comment.userVote === 1"
+                      class="hover:text-primary-500 transition"
+                      [disabled]="!isAuthenticated"
+                    >
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5 10l5-5 5 5H5z"/>
+                      </svg>
+                    </button>
+                    <span class="text-xs font-bold" [class.text-primary-500]="comment.voteCount > 0" [class.text-blue-500]="comment.voteCount < 0">
+                      {{ comment.voteCount }}
+                    </span>
+                    <button 
+                      (click)="voteComment(comment.id, -1)"
+                      [class.text-blue-500]="comment.userVote === -1"
+                      class="hover:text-blue-500 transition"
+                      [disabled]="!isAuthenticated"
+                    >
+                      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M15 10l-5 5-5-5h10z"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Comment content -->
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <div class="text-xs text-gray-500 mb-1">
+                        <span class="font-semibold text-gray-900">u/{{ comment.authorUsername }}</span>
+                        <span class="mx-1">•</span>
+                        <span>{{ getTimeAgo(comment.createdAt) }}</span>
+                      </div>
+                      @if (canDeleteComment(comment)) {
+                        <button 
+                          (click)="deleteComment(comment.id)"
+                          class="text-primary-500 hover:text-primary-700 hover:bg-primary-50 px-2 py-1 rounded transition text-xs"
+                          title="Eliminar comentario"
+                        >
+                        <div style="width: 16px; height: 16px;">                      
+                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M232.7 69.9L224 96L128 96C110.3 96 96 110.3 96 128C96 145.7 110.3 160 128 160L512 160C529.7 160 544 145.7 544 128C544 110.3 529.7 96 512 96L416 96L407.3 69.9C402.9 56.8 390.7 48 376.9 48L263.1 48C249.3 48 237.1 56.8 232.7 69.9zM512 208L128 208L149.1 531.1C150.7 556.4 171.7 576 197 576L443 576C468.3 576 489.3 556.4 490.9 531.1L512 208z"/></svg>
+                        </div>
+                      </button>
+                      }
+                    </div>
+                    <p class="text-gray-700">{{ comment.content }}</p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="bg-white rounded-lg shadow p-8 text-center">
+        <p class="text-gray-500">Cargando post...</p>
+      </div>
+    }
+  </div>
+</div>

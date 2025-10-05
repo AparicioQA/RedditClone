@@ -1,0 +1,68 @@
+<div class="min-h-screen bg-gray-100">
+  <div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-2xl font-bold mb-6">Crea un post</h2>
+
+      <form (ngSubmit)="onSubmit()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Selecciona una comunidad</label>
+          <select
+            [(ngModel)]="postData.subredditId"
+            name="subredditId"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            @for (subreddit of subreddits; track subreddit.id) {
+              <option [value]="subreddit.id">r/{{ subreddit.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Titulo</label>
+          <input
+            type="text"
+            [(ngModel)]="postData.title"
+            name="title"
+            required
+            placeholder="Ingresa un titulo descriptivo"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Texto (opcional)</label>
+          <textarea
+            [(ngModel)]="postData.content"
+            name="content"
+            rows="10"
+            placeholder="Escribe algo que te interese"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+          ></textarea>
+        </div>
+
+        @if (error) {
+          <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {{ error }}
+          </div>
+        }
+
+        <div class="flex space-x-3">
+          <button
+            type="submit"
+            class="bg-primary-500 text-white px-6 py-2 rounded-md hover:bg-primary-600"
+          >
+            Publicar
+          </button>
+          <button
+            type="button"
+            (click)="router.navigate(['/'])"
+            class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400"
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
