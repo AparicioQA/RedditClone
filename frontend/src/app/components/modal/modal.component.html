@@ -1,0 +1,30 @@
+<div *ngIf="modalData" class="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center" (click)="onCancel()">
+  <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="border-b pb-3 mb-4">
+      <h2 class="text-2xl font-bold text-gray-800">{{ modalData.data.title }}</h2>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="mb-6">
+      <p class="text-gray-600">{{ modalData.data.message }}</p>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="flex justify-end space-x-4">
+      <button 
+        *ngIf="modalData.type === 'confirm'" 
+        (click)="onCancel()"
+        class="px-4 py-2 rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition duration-150 ease-in-out font-semibold"
+      >
+        {{ modalData.data.cancelText || 'Cancelar' }}
+      </button>
+      <button 
+        (click)="onConfirm()"
+        class="px-4 py-2 rounded-md text-white bg-primary-500 hover:bg-primary-600 transition duration-150 ease-in-out font-semibold"
+      >
+        {{ modalData.data.confirmText || 'Aceptar' }}
+      </button>
+    </div>
+  </div>
+</div>

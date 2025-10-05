@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { CommentService } from '../../services/comment.service';
 import { AuthService } from '../../services/auth.service';
+import { ModalService } from '../../services/modal.service';
 import { Post } from '../../models/post.model';
 import { Comment } from '../../models/comment.model';
 
@@ -27,7 +28,8 @@ export class PostDetailComponent implements OnInit {
     private router: Router,
     private postService: PostService,
     private commentService: CommentService,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -105,34 +107,50 @@ export class PostDetailComponent implements OnInit {
   }
 
   deletePost(): void {
-    if (!this.post || !confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      return;
-    }
-
-    this.postService.deletePost(this.post.id).subscribe({
-      next: () => {
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        console.error('Error deleting post:', err);
-        alert('No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.');
+    this.modalService.confirm({
+      title: 'Eliminar Publicación',
+      message: '¿Estás seguro de que quieres eliminar esta publicación?',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar'
+    }).subscribe(confirmed => {
+      if (confirmed && this.post) {
+        this.postService.deletePost(this.post.id).subscribe({
+          next: () => {
+            this.router.navigate(['/']);
+          },
+          error: (err) => {
+            console.error('Error deleting post:', err);
+            this.modalService.alert({ 
+              title: 'Error',
+              message: 'No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.'
+            });
+          }
+        });
       }
     });
   }
 
   deleteComment(commentId: number): void {
-    if (!confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
-      return;
-    }
-
-    this.commentService.deleteComment(commentId).subscribe({
-      next: () => {
-        this.loadComments(this.post!.id);
-        this.loadPost(this.post!.id);
-      },
-      error: (err) => {
-        console.error('Error deleting comment:', err);
-        alert('No se pudo eliminar el comentario. Por favor, inténtalo de nuevo.');
+    this.modalService.confirm({
+      title: 'Eliminar Comentario',
+      message: '¿Estás seguro de que quieres eliminar este comentario?',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.commentService.deleteComment(commentId).subscribe({
+          next: () => {
+            this.loadComments(this.post!.id);
+            this.loadPost(this.post!.id);
+          },
+          error: (err) => {
+            console.error('Error deleting comment:', err);
+            this.modalService.alert({ 
+              title: 'Error',
+              message: 'No se pudo eliminar el comentario. Por favor, inténtalo de nuevo.'
+            });
+          }
+        });
       }
     });
   }

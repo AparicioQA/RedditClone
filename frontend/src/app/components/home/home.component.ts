@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PostService } from '../../services/post.service';
 import { AuthService } from '../../services/auth.service';
+import { ModalService } from '../../services/modal.service';
 import { Post } from '../../models/post.model';
 
 @Component({
@@ -19,7 +20,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private postService: PostService,
-    private authService: AuthService
+    private authService: AuthService,
+    private modalService: ModalService
   ) {}
 
   ngOnInit(): void {
@@ -55,17 +57,25 @@ export class HomeComponent implements OnInit {
   }
 
   deletePost(postId: number): void {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta publicación?')) {
-      return;
-    }
-
-    this.postService.deletePost(postId).subscribe({
-      next: () => {
-        this.loadPosts();
-      },
-      error: (err) => {
-        console.error('Error deleting post:', err);
-        alert('No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.');
+    this.modalService.confirm({
+      title: 'Eliminar Publicación',
+      message: '¿Estás seguro de que quieres eliminar esta publicación?',
+      confirmText: 'Eliminar',
+      cancelText: 'Cancelar'
+    }).subscribe(confirmed => {
+      if (confirmed) {
+        this.postService.deletePost(postId).subscribe({
+          next: () => {
+            this.loadPosts();
+          },
+          error: (err) => {
+            console.error('Error deleting post:', err);
+            this.modalService.alert({ 
+              title: 'Error',
+              message: 'No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.'
+            });
+          }
+        });
       }
     });
   }
@@ -90,3 +100,4 @@ export class HomeComponent implements OnInit {
     return `${diffDays}d ago`;
   }
 }
+
