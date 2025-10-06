@@ -70,7 +70,7 @@ export class HomeComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error deleting post:', err);
-            this.modalService.alert({ 
+            this.modalService.alert({
               title: 'Error',
               message: 'No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.'
             });
@@ -89,15 +89,15 @@ export class HomeComponent implements OnInit {
     const postDate = new Date(date);
     const diffMs = now.getTime() - postDate.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    
+
+    if (diffMins < 1) return 'justo ahora';
+    if (diffMins < 60) return `hace ${diffMins}m`;
+
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
-    
+    if (diffHours < 24) return `hace ${diffHours}h`;
+
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return `hace ${diffDays}d`;
   }
 }
 

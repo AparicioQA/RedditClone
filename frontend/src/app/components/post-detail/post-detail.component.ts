@@ -221,19 +221,19 @@ export class PostDetailComponent implements OnInit {
     return this.isAuthenticated && this.currentUser && this.currentUser.username === comment.authorUsername;
   }
 
-  getTimeAgo(date: Date): string {
+   getTimeAgo(date: Date): string {
     const now = new Date();
     const postDate = new Date(date);
     const diffMs = now.getTime() - postDate.getTime();
     const diffMins = Math.floor(diffMs / 60000);
 
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return 'justo ahora';
+    if (diffMins < 60) return `hace ${diffMins}m`;
 
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return `hace ${diffHours}h`;
 
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return `hace ${diffDays}d`;
   }
 }

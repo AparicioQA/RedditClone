@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { 
-  Auth, 
-  createUserWithEmailAndPassword, 
+import {
+  Auth,
+  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   user,
@@ -20,6 +20,15 @@ export class AuthService {
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor() {
+    // Restore user from localStorage if available
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        this.currentUserSubject.next(userObj);
+      } catch {}
+    }
+
     // Subscribe to Firebase auth state changes
     user(this.auth).subscribe((firebaseUser) => {
       if (firebaseUser) {
@@ -30,8 +39,10 @@ export class AuthService {
           createdAt: new Date()
         };
         this.currentUserSubject.next(user);
+        localStorage.setItem('currentUser', JSON.stringify(user));
       } else {
         this.currentUserSubject.next(null);
+        localStorage.removeItem('currentUser');
       }
     });
   }
@@ -51,11 +62,19 @@ export class AuthService {
     return from(
       signInWithEmailAndPassword(this.auth, email, password)
     ).pipe(
-      switchMap(() => of(void 0))
+      switchMap(async () => {
+        const token = await this.getToken();
+        if (token) {
+          localStorage.setItem('authToken', token);
+        }
+        return void 0;
+      })
     );
   }
 
   logout(): Observable<void> {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
     return from(signOut(this.auth));
   }
 
