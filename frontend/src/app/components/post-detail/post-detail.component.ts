@@ -22,6 +22,11 @@ export class PostDetailComponent implements OnInit {
   newComment = '';
   isAuthenticated = false;
   currentUser: any = null;
+    isEditingPost = false;
+    editPostTitle = '';
+    editPostContent = '';
+    editingCommentId: number | null = null;
+    editCommentContent = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -39,6 +44,59 @@ export class PostDetailComponent implements OnInit {
     this.loadPost(postId);
     this.loadComments(postId);
   }
+
+    startEditPost(): void {
+      if (!this.post) return;
+      this.isEditingPost = true;
+      this.editPostTitle = this.post.title;
+      this.editPostContent = this.post.content;
+    }
+
+    cancelEditPost(): void {
+      this.isEditingPost = false;
+    }
+
+    saveEditPost(): void {
+      if (!this.post) return;
+      this.postService.editPost(this.post.id, {
+        title: this.editPostTitle,
+        content: this.editPostContent
+      }).subscribe({
+        next: (updated) => {
+          this.post = updated;
+          this.isEditingPost = false;
+        },
+        error: (err) => {
+          console.error('Error editing post:', err);
+        }
+      });
+    }
+
+    startEditComment(comment: Comment): void {
+      this.editingCommentId = comment.id;
+      this.editCommentContent = comment.content;
+    }
+
+    cancelEditComment(): void {
+      this.editingCommentId = null;
+      this.editCommentContent = '';
+    }
+
+    saveEditComment(comment: Comment): void {
+      this.commentService.editComment(comment.id, {
+        content: this.editCommentContent
+      }).subscribe({
+        next: (updated) => {
+          const idx = this.comments.findIndex(c => c.id === comment.id);
+          if (idx !== -1) this.comments[idx] = updated;
+          this.editingCommentId = null;
+          this.editCommentContent = '';
+        },
+        error: (err) => {
+          console.error('Error editing comment:', err);
+        }
+      });
+    }
 
   loadPost(postId: number): void {
     this.postService.getPost(postId).subscribe({
@@ -120,7 +178,7 @@ export class PostDetailComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error deleting post:', err);
-            this.modalService.alert({ 
+            this.modalService.alert({
               title: 'Error',
               message: 'No se pudo eliminar la publicación. Por favor, inténtalo de nuevo.'
             });
@@ -145,7 +203,7 @@ export class PostDetailComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error deleting comment:', err);
-            this.modalService.alert({ 
+            this.modalService.alert({
               title: 'Error',
               message: 'No se pudo eliminar el comentario. Por favor, inténtalo de nuevo.'
             });
@@ -168,13 +226,13 @@ export class PostDetailComponent implements OnInit {
     const postDate = new Date(date);
     const diffMs = now.getTime() - postDate.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
+
     if (diffMins < 1) return 'just now';
     if (diffMins < 60) return `${diffMins}m ago`;
-    
+
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
-    
+
     const diffDays = Math.floor(diffHours / 24);
     return `${diffDays}d ago`;
   }

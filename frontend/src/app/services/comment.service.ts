@@ -24,4 +24,8 @@ export class CommentService {
   deleteComment(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  editComment(id: number, request: { content: string }): Observable<Comment> {
+    return this.http.put<Comment>(`${this.apiUrl}/${id}`, request);
+  }
 }

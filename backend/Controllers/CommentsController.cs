@@ -97,6 +97,37 @@ public class CommentsController : ControllerBase
     }
 
     [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> EditComment(int id, EditCommentRequest request)
+    {
+        var user = await _firebaseUserService.GetOrCreateUserAsync(User);
+        var userId = user.Id;
+
+        var comment = await _context.Comments.FindAsync(id);
+        if (comment == null)
+        {
+            return NotFound();
+        }
+        if (comment.AuthorId != userId)
+        {
+            return Forbid();
+        }
+        comment.Content = request.Content;
+        await _context.SaveChangesAsync();
+        return Ok(new CommentDto
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+            CreatedAt = comment.CreatedAt,
+            AuthorUsername = user.Username,
+            AuthorId = userId,
+            PostId = comment.PostId,
+            VoteCount = await _context.Votes.Where(v => v.CommentId == comment.Id).SumAsync(v => v.Value),
+            UserVote = null
+        });
+    }
+
+    [Authorize]
     [HttpPost("{id}/vote")]
     public async Task<IActionResult> VoteComment(int id, VoteRequest request)
     {

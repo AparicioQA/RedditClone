@@ -140,6 +140,41 @@ public class PostsController : ControllerBase
     }
 
     [Authorize]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> EditPost(int id, EditPostRequest request)
+    {
+        var user = await _firebaseUserService.GetOrCreateUserAsync(User);
+        var userId = user.Id;
+
+        var post = await _context.Posts.FindAsync(id);
+        if (post == null)
+        {
+            return NotFound();
+        }
+        if (post.AuthorId != userId)
+        {
+            return Forbid();
+        }
+        post.Title = request.Title;
+        post.Content = request.Content;
+        await _context.SaveChangesAsync();
+        return Ok(new PostDto
+        {
+            Id = post.Id,
+            Title = post.Title,
+            Content = post.Content,
+            CreatedAt = post.CreatedAt,
+            AuthorUsername = user.Username,
+            AuthorId = userId,
+            SubredditName = (await _context.Subreddits.FindAsync(post.SubredditId))?.Name,
+            SubredditId = post.SubredditId,
+            VoteCount = await _context.Votes.Where(v => v.PostId == post.Id).SumAsync(v => v.Value),
+            UserVote = null,
+            CommentCount = await _context.Comments.CountAsync(c => c.PostId == post.Id)
+        });
+    }
+
+    [Authorize]
     [HttpPost("{id}/vote")]
     public async Task<IActionResult> VotePost(int id, VoteRequest request)
     {

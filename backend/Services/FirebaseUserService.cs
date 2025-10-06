@@ -48,7 +48,6 @@ public class FirebaseUserService : IFirebaseUserService
                 FirebaseUid = firebaseUid,
                 Username = name,
                 Email = email,
-                PasswordHash = string.Empty, // Not used for Firebase users
                 CreatedAt = DateTime.UtcNow
             };
 

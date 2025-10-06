@@ -17,3 +17,8 @@ public class CommentDto
     public int VoteCount { get; set; }
     public int? UserVote { get; set; }
 }
+
+public class EditCommentRequest
+{
+    public string Content { get; set; } = string.Empty;
+}

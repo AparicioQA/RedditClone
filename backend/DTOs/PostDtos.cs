@@ -26,3 +26,9 @@ public class VoteRequest
 {
     public int Value { get; set; } // +1 or -1
 }
+
+public class EditPostRequest
+{
+    public string Title { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+}

@@ -29,7 +29,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 // Register services
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IFirebaseUserService, FirebaseUserService>();
 
 // Add CORS
